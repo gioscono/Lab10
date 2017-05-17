@@ -17,7 +17,7 @@ public class Main extends Application {
 			PortoController controller = loader.getController();
 
 			
-			// set the model
+		
 			Model model = new Model();
 			controller.setModel(model);
 			
