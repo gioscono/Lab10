@@ -1,9 +1,11 @@
 package it.polito.tdp.porto.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
+import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
@@ -54,4 +56,51 @@ public class Model {
 		
 		return Graphs.neighborListOf(grafo, a);
 	} 
+	
+	public List<Author> getAutoriSecondaBox(Author selez){
+		List<Author> autori2 = new ArrayList<Author>();
+		autori2.addAll(autori);
+		autori2.removeAll(Graphs.neighborListOf(grafo, selez));
+		autori2.remove(selez);
+		return autori2;		
+	}
+	
+	
+	public List<Paper> getPaperList(Author a1, Author a2){
+		
+		List<Paper> listaPaper = new ArrayList<Paper>();
+		DijkstraShortestPath<Author,DefaultEdge> percorso = new  DijkstraShortestPath<Author,DefaultEdge>(grafo, a1, a2); 
+		List<DefaultEdge> listaArchi = percorso.getPathEdgeList();
+//      System.out.println(listaArchi);
+		for(DefaultEdge arco: listaArchi){
+		System.out.println(grafo.getEdgeSource(arco));
+//			System.out.println(grafo.getEdgeTarget(arco));
+			Paper p = dao.getArticoloComune(grafo.getEdgeSource(arco), grafo.getEdgeTarget(arco));
+			listaPaper.add(p);
+		}
+		
+		return listaPaper;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
