@@ -1,7 +1,13 @@
 package it.polito.tdp.porto;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import org.jgrapht.Graphs;
+
+import it.polito.tdp.porto.model.Author;
+import it.polito.tdp.porto.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -9,6 +15,7 @@ import javafx.scene.control.TextArea;
 
 public class PortoController {
 
+	private Model model;
     @FXML
     private ResourceBundle resources;
 
@@ -16,7 +23,7 @@ public class PortoController {
     private URL location;
 
     @FXML
-    private ComboBox<?> boxPrimo;
+    private ComboBox<Author> boxPrimo;
 
     @FXML
     private ComboBox<?> boxSecondo;
@@ -27,6 +34,16 @@ public class PortoController {
     @FXML
     void handleCoautori(ActionEvent event) {
 
+    model.getGrafo();
+    Author selez = boxPrimo.getValue();
+    if(selez==null){
+    	txtResult.appendText("Selezionare un autore!");
+    	return;
+    }
+    List<Author> coautori = model.getCoautoriGrafo(selez);
+    for(Author a : coautori){
+    	txtResult.appendText(a.toString()+"\n");
+    }
     }
 
     @FXML
@@ -41,4 +58,9 @@ public class PortoController {
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Porto.fxml'.";
 
     }
+
+	public void setModel(Model model) {
+		this.model = model;
+		boxPrimo.getItems().addAll(model.getAutori());
+	}
 }
