@@ -15,7 +15,7 @@ public class Model {
 	
 	List<Author> autori;
 	PortoDAO dao = new PortoDAO();
-	private Graph<Author, DefaultEdge> grafo;
+	private Graph<Author, arcoConArticolo> grafo;
 	private AuthorIdMap authorIdMap;
 	private PaperIdMap paperIdMap;
 	
@@ -36,7 +36,7 @@ public class Model {
 		return coautori;
 	}
 	
-	public Graph<Author, DefaultEdge> getGrafo(){
+	public Graph<Author, arcoConArticolo> getGrafo(){
 		if(grafo==null){
 			this.creaGrafo();
 		}
@@ -45,13 +45,17 @@ public class Model {
 	
 	private void creaGrafo(){
 		
-			grafo = new SimpleGraph<Author, DefaultEdge>(DefaultEdge.class);
+			grafo = new SimpleGraph<Author, arcoConArticolo>(arcoConArticolo.class);
 			
 			Graphs.addAllVertices(grafo, autori);
 			
 			for(Author a : autori){
 				for(Author coautore : this.getCoautori(a)){
-					grafo.addEdge(a, coautore);
+					arcoConArticolo arco = grafo.addEdge(a, coautore);
+					if(arco!=null){
+						arco.setP(dao.getArticoloComune(a, coautore, paperIdMap));
+						//System.out.println(arco.getP().toString());
+					}
 				}
 			}
 		
@@ -83,31 +87,19 @@ public class Model {
 public List<Paper> getPaperList(Author a1, Author a2){
 		
 		List<Paper> listaPaper = new ArrayList<Paper>();
-		DijkstraShortestPath<Author,DefaultEdge> percorso = new  DijkstraShortestPath<Author,DefaultEdge>(grafo, a1, a2); 
-		List<DefaultEdge> listaArchi = percorso.getPathEdgeList();
-		for(DefaultEdge arco : listaArchi){
-			System.out.println(arco);
-			Author a = grafo.getEdgeSource(arco);
-			Author b = grafo.getEdgeTarget(arco);
-			boolean trovato = false;
-			List<Paper> paperPa = a.getArticoli();
-			List<Paper> paperPb = b.getArticoli();
-			for(int i = 0; i< paperPa.size() && trovato==false; i++){
-				for(int j=0; j<paperPb.size() && trovato==false; j++){
-					if(paperPa.get(i).equals(paperPb.get(j))){
-						listaPaper.add(paperPa.get(i));
-						trovato = true;
-					}
-				}
+		DijkstraShortestPath<Author,arcoConArticolo> percorso = new  DijkstraShortestPath<Author,arcoConArticolo>(grafo, a1, a2); 
+		List<arcoConArticolo> listaArchi = percorso.getPathEdgeList();
+		if(listaArchi!=null){
+			for(arcoConArticolo arco : listaArchi){
+				System.out.println(arco);
+				listaPaper.add(arco.getP());
+				System.out.println(arco.getP().toString());
 			}
-			
-			
+		return listaPaper;
+		}else{
+			return null;
 		}
 		
-		return listaPaper;
 	}
-	
-	
-	
-	
+		
 }

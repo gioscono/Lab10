@@ -59,6 +59,7 @@ public class PortoController {
     		return;
     	}
     	List<Paper> listaPubb = model.getPaperList(a1, a2);
+    	System.out.println(listaPubb);
     	   
     	for(Paper p: listaPubb){
     		txtResult.appendText(p.getTitle().toString()+"\n");
